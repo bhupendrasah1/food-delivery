@@ -19,6 +19,10 @@ router.post('/login', loginUser); //
 router.get('/me', protect, getCurrentUser);
 router.post('/forgot-password', forgotPassword);
 router.post('/reset-password', resetPassword);
+router.post('/logout', (req, res) => {
+    res.clearCookie('token'); 
+    return res.status(200).json({ message: "Logged out successfully" });
+});
 
 // Google Auth Routes
 router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));

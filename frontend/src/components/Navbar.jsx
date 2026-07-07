@@ -1,11 +1,24 @@
-import React from 'react';
-import { MapPin, Search, ShoppingCart, ChefHat } from 'lucide-react';
+import React, { useState } from 'react'; // useState थपियो
+import { MapPin, Search, ShoppingCart, ChefHat, LogOut } from 'lucide-react'; // LogOut थपियो
 import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
+import axios from 'axios'; // axios थपियो
 
 const Navbar = () => {
+  const [isOpen, setIsOpen] = useState(false);
   const cartItems = useSelector((state) => state.cart.items);
   const totalItems = cartItems.reduce((acc, item) => acc + (item.quantity || 1), 0);
+
+  const handleLogout = async () => {
+    try {
+      await axios.post(`${import.meta.env.VITE_API_URL}/api/auth/logout`, {}, { withCredentials: true });
+      localStorage.removeItem("token");
+      window.location.href = "/login";
+    } catch (error) {
+      console.error("Logout failed", error);
+      alert("Logout failed. Please try again.");
+    }
+  };
 
   return (
     <nav className="sticky top-0 z-40 border-b border-white/70 bg-white/75 backdrop-blur-xl">
@@ -41,31 +54,11 @@ const Navbar = () => {
         </div>
 
         <div className="order-2 ml-auto flex items-center gap-2 lg:order-3">
-          <Link
-            to="/owner-dashboard"
-            className="secondary-button hidden border-dashed px-4 py-2.5 text-sm lg:inline-flex"
-          >
-            Dashboard
-          </Link>
+          <Link to="/owner-dashboard" className="secondary-button hidden border-dashed px-4 py-2.5 text-sm lg:inline-flex">Dashboard</Link>
+          <Link to="/delivery-dashboard" className="secondary-button hidden border-dashed px-4 py-2.5 text-sm xl:inline-flex">Delivery</Link>
+          <Link to="/orders" className="secondary-button px-4 py-2.5 text-sm">My Orders</Link>
 
-          <Link
-            to="/delivery-dashboard"
-            className="secondary-button hidden border-dashed px-4 py-2.5 text-sm xl:inline-flex"
-          >
-            Delivery
-          </Link>
-
-          <Link
-            to="/orders"
-            className="secondary-button px-4 py-2.5 text-sm"
-          >
-            My Orders
-          </Link>
-
-          <Link
-            to="/cart"
-            className="relative inline-flex h-12 w-12 items-center justify-center rounded-2xl border border-orange-200 bg-orange-50 text-orange-600 transition hover:-translate-y-0.5 hover:bg-orange-100"
-          >
+          <Link to="/cart" className="relative inline-flex h-12 w-12 items-center justify-center rounded-2xl border border-orange-200 bg-orange-50 text-orange-600 transition hover:-translate-y-0.5 hover:bg-orange-100">
             <ShoppingCart size={20} />
             {totalItems > 0 && (
               <span className="absolute -right-1 -top-1 inline-flex min-w-5 items-center justify-center rounded-full bg-rose-500 px-1.5 py-0.5 text-[10px] font-bold text-white shadow-md shadow-rose-500/25">
@@ -74,8 +67,25 @@ const Navbar = () => {
             )}
           </Link>
 
-          <div className="hidden h-12 w-12 items-center justify-center rounded-2xl bg-slate-900 text-sm font-bold text-white shadow-lg shadow-slate-900/15 sm:flex">
-            A
+          {/* Profile Dropdown */}
+          <div className="relative">
+            <button 
+              onClick={() => setIsOpen(!isOpen)}
+              className="flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-900 text-sm font-bold text-white shadow-lg shadow-slate-900/15"
+            >
+              A
+            </button>
+            
+            {isOpen && (
+              <div className="absolute right-0 mt-2 w-32 rounded-xl bg-white p-2 shadow-xl border border-slate-100 z-50">
+                <button 
+                  onClick={handleLogout}
+                  className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-red-600 hover:bg-red-50 transition"
+                >
+                  <LogOut size={16} /> Logout
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>
