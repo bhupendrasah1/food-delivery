@@ -29,7 +29,7 @@ const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
     origin: [
-      "https://food-delivery-frontend-xi-blond.vercel.app",
+      process.env.FRONTEND_URL,
       "http://localhost:5173"
     ],
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
